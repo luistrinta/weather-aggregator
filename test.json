@@ -1,0 +1,81 @@
+{
+  "data": {
+    "time": "2024-03-07T15:14:00Z",
+    "values": {
+      "cloudBase": 0.53,
+      "cloudCeiling": null,
+      "cloudCover": 41,
+      "dewPoint": 6.81,
+      "freezingRainIntensity": 0,
+      "humidity": 75,
+      "precipitationProbability": 0,
+      "pressureSurfaceLevel": 1003.86,
+      "rainIntensity": 0,
+      "sleetIntensity": 0,
+      "snowIntensity": 0,
+      "temperature": 11,
+      "temperatureApparent": 11,
+      "uvHealthConcern": 0,
+      "uvIndex": 1,
+      "visibility": 9.99,
+      "weatherCode": 1101,
+      "windDirection": 228.88,
+      "windGust": 14.5,
+      "windSpeed": 5.81
+    }
+  },
+  "location": {
+    "lat": 38.7077522277832,
+    "lon": -9.136591911315918,
+    "name": "Lisboa, Portugal",
+    "type": "administrative"
+  }
+}
+
+{
+    "coord":{
+        "lon":-9.1333,
+        "lat":38.7167
+        },
+        "weather":[
+            {
+            "id":500,
+            "main":"Rain",
+            "description":"light rain",
+            "icon":"10d"}
+            ],
+            "base":"stations",
+            "main":{
+                "temp":285.01,
+                "feels_like":284.11,
+                "temp_min":283.82,
+                "temp_max":286.45,
+                "pressure":1011,
+                "humidity":71
+                },
+                "visibility":10000,
+                "wind":{
+                    "speed":19.67,
+                    "deg":315,
+                    "gust":19.67
+                    },
+                    "rain":{
+                        "1h":0.37
+                        },
+                        "clouds":{
+                            "all":20
+                            },
+                            "dt":1709824182,
+                            "sys":{
+                                "type":1,
+                                "id":6901,
+                                "country":"PT",
+                                "sunrise":1709794784,
+                                "sunset":1709836530
+                                },
+                                "timezone":0,
+                                "id":2267057,
+                                "name":"Lisbon",
+                                "cod":200
+                            }
+

@@ -3,7 +3,7 @@ drop table if exists OPEN_WEATHER;
 drop table if exists MERGED_WEATHER_DATA;
 
 create table TOMORROW_IO (
-id integer primary key,
+id serial primary key,
 date timestamptz,
 location varchar(30),
 temperature float,
@@ -21,7 +21,7 @@ uv_value integer
 );
 
 create table OPEN_WEATHER (
-id integer primary key,
+id serial primary key,
 date timestamptz,
 location varchar(30),
 temperature float,
@@ -39,8 +39,8 @@ sunset_date timestamptz,
 sunrise_date timestamptz
 );
 
-create table MERGED_WEATHER_DATA (
-id integer primary key,
+create table FINAL_WEATHER_DATA (
+id serial primary key,
 date timestamptz,
 location varchar(30),
 temperature float,
