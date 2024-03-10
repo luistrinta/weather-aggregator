@@ -1,6 +1,6 @@
 drop table if exists TOMORROW_IO;
 drop table if exists OPEN_WEATHER;
-drop table if exists MERGED_WEATHER_DATA;
+drop table if exists FINAL_WEATHER_DATA;
 
 create table TOMORROW_IO (
 id serial primary key,
