@@ -8,7 +8,7 @@ import time
 from datetime import datetime
 import signal
 import sys
-
+import pandas as pd
 
 load_dotenv()
 
@@ -31,18 +31,13 @@ except Exception as error:
 
 def extract_weather_data(api_name,location):
     try:
-        if api_name == "TOMORROW_IO":
+        if api_name == "OPEN_WEATHER":
             api_key = os.getenv(api_name)
-            payload = requests.get(f'https://api.tomorrow.io/v4/weather/realtime?location={location}&apikey={api_key}')
-            return json.loads(payload.text)
-        
-        elif api_name == "OPEN_WEATHER":
-            api_key = os.getenv(api_name)
-            payload = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}')
+            payload = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={location[0]}&lon={location[1]}&appid={api_key}')
             return json.loads(payload.text)
         elif api_name == "WEATHER_API":
             api_key = os.getenv(api_name)
-            payload = requests.get(f'http://api.weatherapi.com/v1/current.json?key={api_key}&q={location}&aqi=no')
+            payload = requests.get(f'http://api.weatherapi.com/v1/current.json?key={api_key}&q={location[0]},{location[1]}&aqi=no')
             return json.loads(payload.text)
     except Exception as error:
         print(f"Error when extracting data from API: {error}")
@@ -52,36 +47,14 @@ def load_to_database(payload,table_name,current_date):
     try:
         cursor = conn.cursor()
     
-        if table_name == "TOMORROW_IO":
+        if table_name == "WEATHER_API":
             
             # Safe from SQL injection
-            query =f"INSERT INTO tomorrow_io (date,location,temperature,apparent_temp,pressure,humidity,wind_dir,wind_gust,wind_speed,visibility,precipitation,weather_code,rain_intensity,uv_value) VALUES (TO_TIMESTAMP(%s, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
+            query =f"INSERT INTO weather_api (date,location,location_lat,location_lon,temperature,apparent_temp,pressure,humidity,wind_dir,wind_gust,wind_speed,visibility,precipitation,weather_status,cloud_percentage,uv_value) VALUES (TO_TIMESTAMP(%s, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
             values = (current_date,
                     payload["location"]["name"],
-                    payload["data"]["values"]["temperature"],
-                    payload["data"]["values"]["temperatureApparent"],
-                    payload["data"]["values"]["pressureSurfaceLevel"],
-                    payload["data"]["values"]["humidity"],
-                    payload["data"]["values"]["windDirection"],
-                    payload["data"]["values"]["windGust"],
-                    payload["data"]["values"]["windSpeed"],
-                    payload["data"]["values"]["visibility"],
-                    payload["data"]["values"]["precipitationProbability"],
-                    payload["data"]["values"]["weatherCode"],
-                    payload["data"]["values"]["rainIntensity"],
-                    payload["data"]["values"]["uvHealthConcern"],
-                    )
-                        
-            cursor.execute(query,values)
-            conn.commit()
-            cursor.close()
-    
-        elif table_name == "WEATHER_API":
-            
-            # Safe from SQL injection
-            query =f"INSERT INTO weather_api (date,location,temperature,apparent_temp,pressure,humidity,wind_dir,wind_gust,wind_speed,visibility,precipitation,weather_status,cloud_percentage,uv_value) VALUES (TO_TIMESTAMP(%s, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
-            values = (current_date,
-                    payload["location"]["name"],
+                    payload["location"]["lat"],
+                    payload["location"]["lon"],
                     payload["current"]["temp_c"],
                     payload["current"]["feelslike_c"],
                     payload["current"]["pressure_mb"],
@@ -101,10 +74,12 @@ def load_to_database(payload,table_name,current_date):
             cursor.close()
         
         elif table_name == "OPEN_WEATHER":
-            query =f"INSERT INTO open_weather (date,location,temperature,temperature_min,temperature_max,apparent_temp,pressure,humidity,wind_dir,wind_speed,visibility,weather_status,sunset_date,sunrise_date) VALUES (TO_TIMESTAMP(%s, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,TO_TIMESTAMP(%s), TO_TIMESTAMP(%s)) "
+            query =f"INSERT INTO open_weather (date,location,location_lat,location_lon,temperature,temperature_min,temperature_max,apparent_temp,pressure,humidity,wind_dir,wind_speed,visibility,weather_status,sunset_date,sunrise_date) VALUES (TO_TIMESTAMP(%s, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,TO_TIMESTAMP(%s), TO_TIMESTAMP(%s)) "
             values = (current_date,
                     payload["name"],
-                    payload["main"]["temp"],
+                    payload["coord"]["lat"],
+                    payload["coord"]["lon"],
+                    int(payload["main"]["temp"])-273.16,
                     payload["main"]["temp_min"],
                     payload["main"]["temp_max"],
                     payload["main"]["feels_like"],
@@ -146,14 +121,20 @@ def run_pipeline():
       finally:
         # Gracefully shutdown the client
         stop_threads(thread_list)
-        
+    location_list=pd.read_csv("./worldcities.csv",header=0)
+    location_list= location_list[location_list["iso3"]=="PRT"]
+    print(location_list)
+    for location in location_list.iterrows():
+            print((float(location[1]["lat"]),float(location[1]["lng"])))         
     try:        
-        location_list=["Lisbon","OPorto"]
-        api_names = ["OPEN_WEATHER","WEATHER_API"]
-        for location in location_list:
+        location_list=pd.read_csv("./worldcities.csv",header=0)
+        location_list= location_list[location_list["iso3"]=="PRT"]
+        
+        api_names = ["WEATHER_API"]
+        for location in location_list.iterrows():
             for name in api_names:
                 try:
-                    t = threading.Thread(target=lambda: every(60,extract_weather_data,transform_data,load_to_database,name,location))
+                    t = threading.Thread(target=lambda: every(300,extract_weather_data,transform_data,load_to_database,name,(float(location[1]["lat"]),float(location[1]["lng"]))))
                     t.start()
                     thread_list.append(t)
                 except Exception as error:
