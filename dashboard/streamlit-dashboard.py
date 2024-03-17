@@ -15,10 +15,9 @@ load_dotenv()
 
 def connect_to_database():
     try:
-        thread_list =[]  
         conn = psycopg2.connect(database=os.getenv("DATABASE"),
                                     host=os.getenv("HOST"),
-                                    user="postgres",
+                                    user="lmtrinta",
                                     password="15565516",
                                     port=os.getenv("PORT")
         )
