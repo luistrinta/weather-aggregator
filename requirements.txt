@@ -1,6 +1,5 @@
 requests
 python-dotenv
 psycopg2-binary
-psycopg2-pool
 streamlit
 pandas
