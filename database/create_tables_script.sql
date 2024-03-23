@@ -5,7 +5,7 @@ drop table if exists FINAL_WEATHER_DATA;
 create table OPEN_WEATHER (
 id serial primary key,
 date timestamptz,
-location varchar(30),
+location varchar(1000),
 location_lat float,
 location_lon float,
 temperature float,
