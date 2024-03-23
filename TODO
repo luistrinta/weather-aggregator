@@ -1,2 +1,2 @@
-  Use of Constants: Define constants for strings like API names ("OPEN_WEATHER", "WEATHER_API") to avoid hardcoding them. This improves readability and maintainability.
- Logging: Implement logging instead of printing messages directly to the console. Logging provides more control over the output and allows you to configure log levels and destinations easily.
+ ☐ Use of Constants: Define constants for strings like API names ("OPEN_WEATHER", "WEATHER_API") to avoid hardcoding them. This improves readability and maintainability.
+ ☐ Logging: Implement logging instead of printing messages directly to the console. Logging provides more control over the output and allows you to configure log levels and destinations easily.
