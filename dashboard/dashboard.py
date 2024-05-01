@@ -17,8 +17,8 @@ def connect_to_database():
     try:
         conn = psycopg2.connect(database=os.getenv("DATABASE"),
                                     host=os.getenv("HOST"),
-                                    user="lmtrinta",
-                                    password="15565516",
+                                    user=os.getenv("USER"),
+                                    password=os.getenv("PASSWORD"),
                                     port=os.getenv("PORT")
         )
         return conn
@@ -37,7 +37,7 @@ def fetch_data(connection,selected_api):
 with st.container():
     col1, col2 = st.columns(2)
     location= ["Lisbon","Porto"]
-    api = ["OPEN_WEATHER","WEATHER_API","FULL_WEATHER_DATA"]
+    api = ["OPEN_WEATHER"]
     
     selected_api = st.selectbox(
             'Choose the API you wish to view',
@@ -74,7 +74,7 @@ st.pydeck_chart(pdk.Deck(
            'HexagonLayer',
            data=chart_data_temp,
            get_position='[lon, lat]',
-           radius=8000,
+           radius=2000,
            elevation_scale=7,
            elevation_range=[0, 1500],
            pickable=True,
@@ -89,6 +89,5 @@ st.pydeck_chart(pdk.Deck(
         ),
     ],
 ))
-
 
 

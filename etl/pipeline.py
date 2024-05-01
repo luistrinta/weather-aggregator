@@ -1,5 +1,5 @@
 import os
-from datetime import datetime,timedelta
+from datetime import datetime
 import uuid
 from etl.loader import Loader
 from etl.extractor import Extractor
@@ -49,25 +49,18 @@ class Pipeline:
                         try:
                             data = self.extract_data(query_string="lat={lat}&lon={lon}&appid={api_key}",api_key=self.extractor.api_key,lat=location[0],lon=location[1])
                             result = self.prepare_for_loading(table_name="OPEN_WEATHER" ,payload=data,current_date=current_date)
+                            print(result)
                             self.load_data(query=result[0],values=result[1])
                         except Exception as error:
                              if self.running:
                                 print(f"Error when processing data for OPEN_WEATHER API: {error}")
                              break
-                    elif api == "WEATHER_API":
-                        try:
-                            data = self.extract_data(query_string="key={api_key}&q={lat},{lon}&aqi=no",api_key=self.extractor.api_key,lat=location[0],lon=location[1])
-                            query,values = self.prepare_for_loading("WEATHER_API" ,data,current_date)
-                            self.load_data(query=query,values=values)
-                        except Exception as error:
-                             if self.running:
-                                print(f"Error when processing data for OPEN_WEATHER API: {error}")
-                             break
                     
-                    for _ in range(delta_timestamp // 3):  # Split the sleep into periods of 3 seconds
+                    for _ in range(delta_timestamp // 30):  # Split the sleep into periods of 3 seconds
+                    
                         if not self.running:
-                            break
-                        time.sleep(3)
+                                break
+                        time.sleep(30)
             
             except Exception:
                 return

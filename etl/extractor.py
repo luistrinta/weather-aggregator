@@ -27,7 +27,9 @@ class Extractor:
             """
             try:       
                 request_url =Formatter().format(self.api_url+"?"+query_string,**kwargs)
+                #print(request_url)
                 payload = requests.get(request_url)
+                #print(payload)
                 return json.loads(payload.text)
                 
             except Exception as error:
